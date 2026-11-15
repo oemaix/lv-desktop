@@ -1,0 +1,18 @@
+# Scratch
+tmp/
+
+# Local Cursor state. Rules and the shell hook are reinstalled by bootstrap.
+.cursor/
+
+# Secrets. .env.example stays tracked.
+.env
+.env.*
+!.env.example
+
+# Nix
+result
+result-*
+.direnv/
+
+# Dev Container. initializeCommand writes the host account name here.
+.devcontainer/host-user

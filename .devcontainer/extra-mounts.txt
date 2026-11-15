@@ -1,0 +1,11 @@
+# One devcontainer mount per line. Copied into every profile's mounts array.
+# Do not mount $HOME. Do not write a gid.
+#
+# Host gitconfig (XDG path; Docker follows the symlink). Read-only, not ~/.gitconfig.
+source=/home/bain/.config/git/config,target=/etc/gitconfig.host,type=bind,readonly
+# Host nix.conf already sets experimental-features. Read-only over the image file.
+source=/etc/nix/nix.conf,target=/etc/nix/nix.conf,type=bind,readonly
+# libsecret session bus. Not read-only. containerEnv sets DBUS_SESSION_BUS_ADDRESS.
+source=${localEnv:XDG_RUNTIME_DIR}/bus,target=/run/host-bus,type=bind
+# GitHub credential helper is `gh auth git-credential`. Config only; no token copy.
+source=/home/bain/.config/gh,target=/home/dev/.config/gh,type=bind,readonly

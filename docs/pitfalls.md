@@ -1,0 +1,117 @@
+# Pitfalls
+
+Status: binding. The next id is P-0011. Do not reuse or renumber an id.
+
+## Index
+
+| Id | Depends on | Summary |
+| --- | --- | --- |
+| [P-0001](#p-0001) | [D-0001](decisions.md#d-0001) | Nix ignores untracked flake files |
+| [P-0002](#p-0002) | [D-0003](decisions.md#d-0003) | `tmp/` is not a requirement |
+| [P-0003](#p-0003) | [D-0004](decisions.md#d-0004) | Resolved: the stack is Electron |
+| [P-0004](#p-0004) | [D-0001](decisions.md#d-0001) | Unborn `HEAD` breaks `rev-parse` |
+| [P-0005](#p-0005) | [D-0006](decisions.md#d-0006) | Impure devshell keeps the host `PATH` |
+| [P-0006](#p-0006) | [D-0011](decisions.md#d-0011) | Stay on Electron 45 |
+| [P-0007](#p-0007) | [D-0012](decisions.md#d-0012) | A preload cannot patch `setTimeout` |
+| [P-0008](#p-0008) | [D-0014](decisions.md#d-0014) | Do not filter page requests |
+| [P-0009](#p-0009) | [D-0014](decisions.md#d-0014) | Do not take the page's keys |
+| [P-0010](#p-0010) | [Operations](operations.md#devshell) | Rootless uid 0 hides the dev home |
+
+## P-0001
+
+Do not run `nix flake lock` or `nix develop` while `flake.nix` is
+untracked. Inside a Git repository, Nix copies only files in the index
+and ignores untracked files.
+
+Stage the flake files with `git add`. Do not create a commit only to
+satisfy Nix.
+
+Depends on [D-0001](decisions.md#d-0001).
+
+## P-0002
+
+Do not treat a file under `tmp/` as a requirement. Tracked documents
+are the source. A file there can support a recommendation. It does
+not close a decision, and it does not rewrite this suite.
+
+Depends on [D-0003](decisions.md#d-0003).
+
+## P-0003
+
+Resolved. [D-0004](decisions.md#d-0004) chose Electron, and
+[D-0011](decisions.md#d-0011) chose Electron 45. Do not add a second
+shell beside Electron. Do not implement on another major
+([P-0006](#p-0006)).
+
+Depends on [D-0004](decisions.md#d-0004).
+
+## P-0004
+
+Do not use `git rev-parse --abbrev-ref HEAD` as proof of the branch
+before the first commit. On Git 2.54 that command exits 128 while
+`HEAD` still points at an unborn branch, including just after
+`git init -b main`. `git symbolic-ref --short HEAD` prints `main`.
+
+Do not create a commit only to make `rev-parse` succeed.
+
+Depends on [D-0001](decisions.md#d-0001).
+
+## P-0005
+
+Do not treat a binary found inside `nix develop` as a package from
+`flake.nix` unless it lives under `/nix/store`. Impure `nix develop`
+keeps the caller's `PATH`. A host tool can resolve even when the
+devshell does not list it.
+
+Depends on [D-0006](decisions.md#d-0006).
+
+## P-0006
+
+Do not implement the shell on a major other than Electron 45.
+[D-0011](decisions.md#d-0011) closed on that line. On 2026-11-15 the
+stable release was 45.3.3. The session that already worked was
+Electron 42, so email login, one wrong card, and one correct card
+still have to pass on 45.
+
+Depends on [D-0011](decisions.md#d-0011).
+
+## P-0007
+
+Do not install the timer wrapper from a preload. Context isolation is
+on, so a preload cannot patch the page's `setTimeout`. Call
+`webContents.executeJavaScript` on `dom-ready`. The page calls the
+global `setTimeout` when the reader answers, so a wrapper installed
+after the bundle loads still runs.
+
+Depends on [D-0012](decisions.md#d-0012).
+
+## P-0008
+
+Do not filter the page's requests. Card JSON, progress sync, and
+audio are ordinary loads. A blocklist breaks the cards and adds
+nothing the study loop needs. Host limits apply to navigation and
+`window.open`, not to those loads.
+
+Depends on [D-0014](decisions.md#d-0014).
+
+## P-0009
+
+Do not bind arrows, space, or enter in the shell, and do not add
+global hotkeys. The page already owns those keys. An empty menu is
+what keeps them on the page.
+
+Depends on [D-0014](decisions.md#d-0014).
+
+## P-0010
+
+On rootless Docker the bind-mounted workspace is uid 0 inside the
+container. `realize.sh` then runs `usermod -o` so the account `dev`
+shares uid 0 with `root`. `getpwuid(0)` returns the first
+`/etc/passwd` line. While that line is `root`, Docker sets
+`HOME=/root`. The gitconfig and the mounted `gh` directory under
+`/home/dev` are not read.
+
+After that uid rewrite, put the `dev` line ahead of `root`. Leave the
+name `root` at uid 0 so `sudo` can still find it.
+
+Depends on the Dev Container in [Operations](operations.md#devshell).

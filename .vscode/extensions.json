@@ -1,0 +1,7 @@
+{
+  "recommendations": [
+    "jnoortheen.nix-ide",
+    "editorconfig.editorconfig",
+    "DavidAnson.vscode-markdownlint"
+  ]
+}

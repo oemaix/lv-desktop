@@ -105,6 +105,8 @@ jobs:
     permissions:
       contents: write
     steps:
+      - name: Check out
+        uses: actions/checkout@v4
       - name: Download packages
         uses: actions/download-artifact@v4
         with:
@@ -120,7 +122,8 @@ jobs:
             echo "no packages to publish" >&2
             exit 1
           fi
-          node -e 'require("fs").writeFileSync("release-notes.txt", ["Linux, macOS, and Windows packages for amd64 (x64) and aarch64 (arm64).", "", "These packages are not signed. macOS has no Apple certificate and is not notarized. Windows has no Authenticode signature. The first launch asks for confirmation.", "", "On macOS, copy the app out of the DMG. The first time, open it from the context menu. The arm64 MSI is built by an x64 WiX toolset and installs the arm64 app.", ""].join("\n"))'
+          notes="${RUNNER_TEMP}/release-notes.txt"
+          node -e 'require("fs").writeFileSync(process.argv[1], ["Linux, macOS, and Windows packages for amd64 (x64) and aarch64 (arm64).", "", "These packages are not signed. macOS has no Apple certificate and is not notarized. Windows has no Authenticode signature. The first launch asks for confirmation.", "", "On macOS, copy the app out of the DMG. The first time, open it from the context menu. The arm64 MSI is built by an x64 WiX toolset and installs the arm64 app.", ""].join("\n"))' "$notes"
           gh release create "$GITHUB_REF_NAME" "${files[@]}" \
             --title "$GITHUB_REF_NAME" \
-            --notes-file release-notes.txt
+            --notes-file "$notes"

@@ -1,6 +1,6 @@
 # Pitfalls
 
-Status: binding. The next id is P-0016. Do not reuse or renumber an id.
+Status: binding. The next id is P-0017. Do not reuse or renumber an id.
 
 ## Index
 
@@ -21,6 +21,7 @@ Status: binding. The next id is P-0016. Do not reuse or renumber an id.
 | [P-0013](#p-0013) | [D-0014](decisions.md#d-0014) | Do not deny every other permission |
 | [P-0014](#p-0014) | [D-0012](decisions.md#d-0012) | The study origin stays in one window |
 | [P-0015](#p-0015) | [D-0016](decisions.md#d-0016) | Release packages are built on GitHub Actions |
+| [P-0016](#p-0016) | [D-0016](decisions.md#d-0016) | Do not set `build.license` |
 
 ## P-0001
 
@@ -178,5 +179,14 @@ not start under Nix ([P-0011](#p-0011)). DMG is built on macOS. MSI
 is built on Windows. AppImage, deb, and rpm are built on Linux.
 The packages are unsigned. The arm64 MSI from electron-builder
 26.18.0 is an x64 WiX package that installs the arm64 app.
+
+Depends on [D-0016](decisions.md#d-0016).
+
+## P-0016
+
+Do not put `license` in the electron-builder `build` object.
+electron-builder 26 rejects that key and stops before it writes a
+package. The SPDX identifier stays in `package.json`. The
+`LICENSE` file is packed through `files` and `extraResources`.
 
 Depends on [D-0016](decisions.md#d-0016).

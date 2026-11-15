@@ -24,7 +24,6 @@
     "electronVersion": "45.3.3",
     "npmRebuild": false,
     "asar": true,
-    "license": "LICENSE",
     "files": [
       "src/**/*",
       "assets/**/*",

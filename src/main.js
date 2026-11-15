@@ -236,11 +236,18 @@ function focusMainWindow() {
   mainWindow.focus();
 }
 
+function windowIconPath() {
+  if (app.isPackaged) {
+    return path.join(process.resourcesPath, "icon.png");
+  }
+  return path.join(__dirname, "..", "assets", "icon.png");
+}
+
 function createMainWindow() {
   const win = new BrowserWindow({
     width: 1280,
     height: 800,
-    icon: path.join(__dirname, "..", "assets", "icon.png"),
+    icon: windowIconPath(),
     webPreferences: pageWebPreferences(),
   });
   mainWindow = win;

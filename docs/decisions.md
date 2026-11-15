@@ -1,8 +1,8 @@
 # Decisions
 
-Status: scope, engine, release, and license are decided
+Status: scope, engine, release, license, and packages are decided
 ([D-0003](#d-0003), [D-0004](#d-0004), [D-0011](#d-0011),
-[D-0015](#d-0015)).
+[D-0015](#d-0015), [D-0016](#d-0016)).
 
 Ids stay `D-xxxx`. The next id is one greater than the highest id in
 this file. Never reuse or renumber an id. Closing a decision moves
@@ -27,6 +27,7 @@ that entry from Undecided to Decided and does not change its id.
 | [D-0013](#d-0013) | Correct-answer hold becomes 100ms |
 | [D-0014](#d-0014) | Session, permissions, and link policy |
 | [D-0015](#d-0015) | GNU GPL version 3 only |
+| [D-0016](#d-0016) | Unsigned packages for both arches |
 
 ### D-0001
 
@@ -300,6 +301,25 @@ Source: User request on 2026-11-15.
 
 Consequence: `package.json` names that identifier. The README states
 it. Contributions stay under the same license.
+
+### D-0016
+
+Status: Decided
+
+Choice: Publish AppImage, deb, and rpm for Linux, DMG for macOS, and
+MSI for Windows. Each format is built for amd64 (`x64`) and aarch64
+(`arm64`). macOS is not signed and is not notarized. Windows is not
+Authenticode-signed. electron-builder 26.18.0 packs Electron 45.3.3.
+A version tag `vX.Y.Z` on GitHub Actions builds the packages and
+publishes the GitHub release. The tag matches `package.json`.
+
+Source: User request on 2026-11-15.
+
+Consequence: The workflow is `.github/workflows/release.yml`. The
+Nix devshell does not build these packages
+([P-0015](pitfalls.md#p-0015)). The arm64 MSI is produced by the
+x64 WiX toolset in this electron-builder release and installs the
+arm64 app.
 
 ## Undecided
 

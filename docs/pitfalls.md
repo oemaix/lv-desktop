@@ -1,6 +1,6 @@
 # Pitfalls
 
-Status: binding. The next id is P-0015. Do not reuse or renumber an id.
+Status: binding. The next id is P-0016. Do not reuse or renumber an id.
 
 ## Index
 
@@ -20,6 +20,7 @@ Status: binding. The next id is P-0015. Do not reuse or renumber an id.
 | [P-0012](#p-0012) | [P-0010](#p-0010) | Electron 45 will not start as uid 0 |
 | [P-0013](#p-0013) | [D-0014](decisions.md#d-0014) | Do not deny every other permission |
 | [P-0014](#p-0014) | [D-0012](decisions.md#d-0012) | The study origin stays in one window |
+| [P-0015](#p-0015) | [D-0016](decisions.md#d-0016) | Release packages are built on GitHub Actions |
 
 ## P-0001
 
@@ -168,3 +169,14 @@ Do not open a second window for the study origin. `window.open` of
 the OAuth hosts that post to `window.opener` stay child windows.
 
 Depends on [D-0012](decisions.md#d-0012).
+
+## P-0015
+
+Do not build the release packages inside the Nix devshell. The
+packager downloads the official Electron zip, and that binary does
+not start under Nix ([P-0011](#p-0011)). DMG is built on macOS. MSI
+is built on Windows. AppImage, deb, and rpm are built on Linux.
+The packages are unsigned. The arm64 MSI from electron-builder
+26.18.0 is an x64 WiX package that installs the arm64 app.
+
+Depends on [D-0016](decisions.md#d-0016).

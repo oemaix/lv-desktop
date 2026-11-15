@@ -63,6 +63,23 @@ push and pull request. The workflow is
 `.github/workflows/test.yml`. It checks the shell. It does not
 launch Electron.
 
+## Packages
+
+AppImage, deb, rpm, DMG, and MSI are built for amd64 and aarch64
+([D-0016](decisions.md#d-0016)). electron-builder calls those arches
+`x64` and `arm64`. macOS is not signed and is not notarized. Windows
+is not Authenticode-signed.
+
+The Nix devshell does not build them
+([P-0015](pitfalls.md#p-0015)). GitHub Actions does, from
+`.github/workflows/release.yml`, when a tag `vX.Y.Z` is pushed.
+That tag matches the `version` in `package.json`. The same workflow
+can be started by hand. A hand start uploads the artifacts and does
+not publish a release.
+
+The arm64 MSI is built by the x64 WiX toolset in electron-builder
+26.18.0. It installs the arm64 app.
+
 ## Editor extensions
 
 | Extension | Why it is required |

@@ -1,0 +1,126 @@
+name: release
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  linux:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: [x64, arm64]
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+      - name: Install
+        run: npm ci
+      - name: Check tag version
+        run: node scripts/check-release-tag.js
+      - name: Install package tools
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends fakeroot dpkg rpm binutils
+      - name: Build
+        run: npx electron-builder --linux AppImage deb rpm --${{ matrix.arch }} --publish never
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: "false"
+      - name: Upload packages
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-${{ matrix.arch }}
+          if-no-files-found: error
+          path: |
+            dist/*.AppImage
+            dist/*.deb
+            dist/*.rpm
+
+  macos:
+    runs-on: macos-latest
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+      - name: Install
+        run: npm ci
+      - name: Check tag version
+        run: node scripts/check-release-tag.js
+      - name: Build
+        run: npx electron-builder --mac dmg --x64 --arm64 --publish never
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: "false"
+      - name: Upload packages
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos
+          if-no-files-found: error
+          path: dist/*.dmg
+
+  windows:
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: [x64, arm64]
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+      - name: Install
+        run: npm ci
+      - name: Check tag version
+        run: node scripts/check-release-tag.js
+      - name: Build
+        run: npx electron-builder --win msi --${{ matrix.arch }} --publish never
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: "false"
+      - name: Upload packages
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-${{ matrix.arch }}
+          if-no-files-found: error
+          path: dist/*.msi
+
+  publish:
+    needs: [linux, macos, windows]
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download packages
+        uses: actions/download-artifact@v4
+        with:
+          path: packages
+          merge-multiple: true
+      - name: Publish GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          shopt -s nullglob
+          files=(packages/*)
+          if [ "${#files[@]}" -eq 0 ]; then
+            echo "no packages to publish" >&2
+            exit 1
+          fi
+          node -e 'require("fs").writeFileSync("release-notes.txt", ["Linux, macOS, and Windows packages for amd64 (x64) and aarch64 (arm64).", "", "These packages are not signed. macOS has no Apple certificate and is not notarized. Windows has no Authenticode signature. The first launch asks for confirmation.", "", "On macOS, copy the app out of the DMG. The first time, open it from the context menu. The arm64 MSI is built by an x64 WiX toolset and installs the arm64 app.", ""].join("\n"))'
+          gh release create "$GITHUB_REF_NAME" "${files[@]}" \
+            --title "$GITHUB_REF_NAME" \
+            --notes-file release-notes.txt

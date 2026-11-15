@@ -7,7 +7,9 @@ Status: scope and Electron 45 are decided
 ## Current status
 
 Phase: the Electron 45 shell runs. Email login and the flashcards
-were confirmed on this build.
+were confirmed on this build. A version tag builds AppImage, deb,
+rpm, DMG, and MSI for amd64 and aarch64
+([D-0016](decisions.md#d-0016)).
 
 ## Next
 

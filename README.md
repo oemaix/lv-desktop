@@ -31,8 +31,29 @@ nix develop
 npm start
 ```
 
-That opens the study site. There is no installer yet. You need a
-Lingvist account to study.
+That opens the study site from a checkout. You need a Lingvist
+account to study.
+
+## Install
+
+GitHub release `v0.1.0` and later has one package per system and
+processor. amd64 is the Intel or AMD 64-bit build. aarch64 is the
+ARM 64-bit build.
+
+| System | Package |
+| --- | --- |
+| Linux | AppImage, deb, or rpm |
+| macOS | DMG |
+| Windows | MSI |
+
+These files are not signed. macOS has no Apple certificate and is
+not notarized. Windows has no Authenticode signature. The first
+launch asks you to confirm.
+
+On macOS, copy the app out of the DMG. The first time, open it from
+the context menu. On Linux, the AppImage needs FUSE, and deb or rpm
+install through the package manager. The arm64 Windows MSI is built
+by an x64 installer tool and installs the arm64 app.
 
 ## Develop
 

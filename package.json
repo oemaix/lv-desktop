@@ -1,12 +1,87 @@
 {
   "name": "lv-desktop",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Single-window Lingvist desk client",
   "license": "GPL-3.0-only",
+  "homepage": "https://github.com/oemaix/lv-desktop",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/oemaix/lv-desktop.git"
+  },
   "main": "src/main.js",
   "scripts": {
     "start": "node scripts/start.js",
-    "test": "node --test test/*.js"
+    "test": "node --test test/*.js",
+    "dist": "electron-builder --publish never"
+  },
+  "devDependencies": {
+    "electron-builder": "26.18.0"
+  },
+  "build": {
+    "appId": "app.lvdesktop.client",
+    "productName": "lv-desktop",
+    "electronVersion": "45.3.3",
+    "npmRebuild": false,
+    "asar": true,
+    "license": "LICENSE",
+    "files": [
+      "src/**/*",
+      "assets/**/*",
+      "package.json",
+      "LICENSE"
+    ],
+    "extraResources": [
+      {
+        "from": "assets/icon.png",
+        "to": "icon.png"
+      },
+      {
+        "from": "LICENSE",
+        "to": "LICENSE"
+      }
+    ],
+    "linux": {
+      "icon": "assets/icon.png",
+      "category": "Education",
+      "maintainer": "lv-desktop contributors",
+      "target": [
+        {
+          "target": "AppImage",
+          "arch": ["x64", "arm64"]
+        },
+        {
+          "target": "deb",
+          "arch": ["x64", "arm64"]
+        },
+        {
+          "target": "rpm",
+          "arch": ["x64", "arm64"]
+        }
+      ]
+    },
+    "mac": {
+      "icon": "assets/icon.png",
+      "category": "public.app-category.education",
+      "identity": null,
+      "notarize": false,
+      "gatekeeperAssess": false,
+      "target": [
+        {
+          "target": "dmg",
+          "arch": ["x64", "arm64"]
+        }
+      ]
+    },
+    "win": {
+      "icon": "assets/icon.png",
+      "signExecutable": false,
+      "target": [
+        {
+          "target": "msi",
+          "arch": ["x64", "arm64"]
+        }
+      ]
+    }
   }
 }

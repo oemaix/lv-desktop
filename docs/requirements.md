@@ -1,9 +1,9 @@
 # Requirements
 
-Status: required shell behavior ([D-0003](decisions.md#d-0003),
-[D-0012](decisions.md#d-0012), [D-0013](decisions.md#d-0013),
-[D-0014](decisions.md#d-0014)). The shell is Electron 45
-([D-0011](decisions.md#d-0011)).
+Status: required shell behavior, implemented in `src/`
+([D-0003](decisions.md#d-0003), [D-0012](decisions.md#d-0012),
+[D-0013](decisions.md#d-0013), [D-0014](decisions.md#d-0014)). The
+shell is Electron 45 ([D-0011](decisions.md#d-0011)).
 
 The site facts below were measured in a logged-in session on
 2026-11-15. Sentence audio was off for that account. Auto-advance was

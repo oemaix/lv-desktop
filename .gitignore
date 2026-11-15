@@ -14,5 +14,11 @@ result
 result-*
 .direnv/
 
+# Electron 45
+node_modules/
+dist/
+out/
+release/
+
 # Dev Container. initializeCommand writes the host account name here.
 .devcontainer/host-user

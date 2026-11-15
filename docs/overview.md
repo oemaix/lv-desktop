@@ -1,6 +1,6 @@
 # Overview
 
-Status: specified, not built. The product is decided
+Status: the shell is implemented. The product is decided
 ([D-0003](decisions.md#d-0003)). The shell is Electron 45
 ([D-0004](decisions.md#d-0004), [D-0011](decisions.md#d-0011)).
 
@@ -13,5 +13,4 @@ Lingvist stays the teacher. The window opens the study site. The
 shell keeps the session, stays out of the keyboard, and shortens one
 fixed pause after a correct answer.
 
-The name follows the workspace directory. There is no application
-code yet.
+The name follows the workspace directory. The program is `src/`.

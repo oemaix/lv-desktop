@@ -1,6 +1,6 @@
 # Operations
 
-Status: specified, not built. No deploy and no application process.
+Status: the devshell builds and runs the shell. No deploy.
 The nixpkgs pin is [D-0005](decisions.md#d-0005). Packages are
 [D-0006](decisions.md#d-0006). Extensions are
 [D-0007](decisions.md#d-0007).
@@ -14,15 +14,18 @@ nix develop
 ```
 
 The shell provides bash, zsh, git, curl, CA certificates, coreutils,
-and Python 3. Node.js and Electron 45 are not installed yet. They
-are added with the implementation ([D-0011](decisions.md#d-0011)).
+Python 3, Node.js 24, and Electron 45.3.3. Electron is built with
+the pinned nixpkgs binary builder because that channel has no
+`electron_45` attribute ([P-0011](pitfalls.md#p-0011)).
+
+`ELECTRON_OVERRIDE_DIST_PATH` points at that Electron dist directory.
+`ELECTRON_SKIP_BINARY_DOWNLOAD=1` keeps npm from fetching a second
+binary. There is no `shellHook`. Agent commands enter this shell on
+every invocation, so a banner would repeat.
 
 The default `nix develop` is impure: the caller's `PATH` is still
 searched, so a host binary is not a devshell package
 ([P-0005](pitfalls.md#p-0005)).
-
-There is no `shellHook`. Agent commands enter this shell on every
-invocation, so a banner would repeat.
 
 If `flake.nix` is not in the Git index yet, stage `flake.nix` and
 `flake.lock` before the command above
@@ -38,6 +41,21 @@ A Dev Container is optional. The flake is still the environment.
 Opening the folder on the host without Docker leaves this shell and
 the terminal profile unchanged.
 
+## Run
+
+From the repository root, inside the devshell:
+
+```sh
+npm test
+npm start
+```
+
+`npm test` checks the shell without opening a window. `npm start`
+opens `https://learn.lingvist.com/`. `electron` on `PATH` is the
+devshell's Electron 45.3.3. This Dev Container is uid 0, so
+`npm start` adds `--no-sandbox` before Electron's startup check
+([P-0012](pitfalls.md#p-0012)). `electron .` alone exits here.
+
 ## Editor extensions
 
 | Extension | Why it is required |
@@ -46,8 +64,9 @@ the terminal profile unchanged.
 | `editorconfig.editorconfig` | Apply the root `.editorconfig` ([D-0010](decisions.md#d-0010)) |
 | `DavidAnson.vscode-markdownlint` | Lint the doc suite |
 
-Install them from `.vscode/extensions.json`. No JavaScript extension
-is recommended until the tree has JavaScript to edit
+Install them from `.vscode/extensions.json`. `src/` and `test/` are
+JavaScript. The editor's built-in JavaScript support covers them, so
+no extra extension is recommended
 ([D-0007](decisions.md#d-0007)).
 
 ## Cursor hook

@@ -1,7 +1,8 @@
 # Use cases
 
 Status: the client is the desk shell in
-[D-0003](decisions.md#d-0003). No application code runs these yet.
+[D-0003](decisions.md#d-0003). `src/` is that shell. Email login and
+the flashcards were confirmed on this build.
 
 ## Study at the desk
 

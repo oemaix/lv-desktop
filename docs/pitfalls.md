@@ -1,6 +1,6 @@
 # Pitfalls
 
-Status: binding. The next id is P-0011. Do not reuse or renumber an id.
+Status: binding. The next id is P-0013. Do not reuse or renumber an id.
 
 ## Index
 
@@ -16,6 +16,8 @@ Status: binding. The next id is P-0011. Do not reuse or renumber an id.
 | [P-0008](#p-0008) | [D-0014](decisions.md#d-0014) | Do not filter page requests |
 | [P-0009](#p-0009) | [D-0014](decisions.md#d-0014) | Do not take the page's keys |
 | [P-0010](#p-0010) | [Operations](operations.md#devshell) | Rootless uid 0 hides the dev home |
+| [P-0011](#p-0011) | [D-0006](decisions.md#d-0006) | Use the devshell Electron 45 binary |
+| [P-0012](#p-0012) | [P-0010](#p-0010) | Electron 45 will not start as uid 0 |
 
 ## P-0001
 
@@ -69,9 +71,8 @@ Depends on [D-0006](decisions.md#d-0006).
 
 Do not implement the shell on a major other than Electron 45.
 [D-0011](decisions.md#d-0011) closed on that line. On 2026-11-15 the
-stable release was 45.3.3. The session that already worked was
-Electron 42, so email login, one wrong card, and one correct card
-still have to pass on 45.
+stable release was 45.3.3. Email login and the flashcards passed
+on that build. Do not treat an Electron 42 session as this port.
 
 Depends on [D-0011](decisions.md#d-0011).
 
@@ -115,3 +116,34 @@ After that uid rewrite, put the `dev` line ahead of `root`. Leave the
 name `root` at uid 0 so `sudo` can still find it.
 
 Depends on the Dev Container in [Operations](operations.md#devshell).
+
+## P-0011
+
+Do not run Electron from the binary the npm `electron` package
+downloads, and do not use `electron_44` from this nixpkgs pin. The
+download is built for a normal Linux linker and does not start under
+Nix. nixos-26.05 has no `electron_45` attribute. The shell stays on
+Electron 45 ([P-0006](#p-0006)).
+
+The devshell builds 45.3.3 with that pin's electron binary builder
+and puts `electron` on `PATH`. `ELECTRON_OVERRIDE_DIST_PATH` points
+at its dist directory. `ELECTRON_SKIP_BINARY_DOWNLOAD=1` stops npm
+from fetching the other binary.
+
+Depends on [D-0006](decisions.md#d-0006) and
+[D-0011](decisions.md#d-0011).
+
+## P-0012
+
+Do not expect Electron 45 to start as uid 0 while Chromium's process
+sandbox is required. The process exits before the window exists.
+This Dev Container is uid 0 ([P-0010](#p-0010)).
+
+That check runs in C++ before the main script, so
+`app.commandLine.appendSwitch` is too late. `npm start` runs
+`scripts/start.js`, which puts `--no-sandbox` on the command line
+only when `getuid()` is 0. `webPreferences.sandbox` stays on. A
+normal account does not pass that switch, so the process sandbox
+stays on there.
+
+Depends on [P-0010](#p-0010) and [D-0012](decisions.md#d-0012).

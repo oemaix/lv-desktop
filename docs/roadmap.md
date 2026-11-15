@@ -6,17 +6,9 @@ Status: scope and Electron 45 are decided
 
 ## Current status
 
-Phase: specified, not built. The doc suite describes the desk client
-on Electron 45. No application code exists. The Nix devshell is the
-only environment.
+Phase: the Electron 45 shell runs. Email login and the flashcards
+were confirmed on this build.
 
 ## Next
-
-1. Add the Electron 45 toolchain to the devshell, and ignore its
-   build outputs in the same change.
-2. Implement the shell in [architecture](architecture.md) and
-   [requirements](requirements.md).
-3. On that build, confirm email login, one wrong card, and one
-   correct card.
 
 Dates are not set.

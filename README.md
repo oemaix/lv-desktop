@@ -1,13 +1,13 @@
 # lv-desktop
 
-Status: specified, not built. Single-window Lingvist desk client
+Status: shell implemented. Single-window Lingvist desk client
 ([D-0003](docs/decisions.md#d-0003)) on Electron 45
 ([D-0004](docs/decisions.md#d-0004), [D-0011](docs/decisions.md#d-0011)).
 
 ## Current status
 
-The documents describe the client. There is no program to build or
-run. The Nix devshell is the way into the repository.
+The shell is `src/`. It runs in the Nix devshell on Electron 45.
+Email login and the flashcards were confirmed on this build.
 
 ## Docs
 
@@ -38,3 +38,15 @@ repository ([P-0001](docs/pitfalls.md#p-0001)). Details are in
 
 A Dev Container is optional. The flake is still the environment, and
 the host shell is unchanged when Docker is not used.
+
+## Run
+
+Inside the devshell:
+
+```sh
+npm test
+npm start
+```
+
+`npm start` opens the study site. Details are in
+[Operations](docs/operations.md).

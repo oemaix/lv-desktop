@@ -38,9 +38,8 @@ Source: Bootstrap procedure.
 Consequence: Nix reads the flake from the Git index
 ([P-0001](pitfalls.md#p-0001)). `.gitignore` ignores `tmp/`,
 `.cursor/`, `.env`, `.env.*` (not `.env.example`), `result`,
-`result-*`, and `.direnv/`. `.vscode/` and `.cursorignore` stay
-tracked. Electron 45 build outputs are ignored when that toolchain
-is added ([D-0011](#d-0011)).
+`result-*`, `.direnv/`, `node_modules/`, `dist/`, `out/`, and
+`release/`. `.vscode/` and `.cursorignore` stay tracked.
 
 ### D-0002
 
@@ -79,7 +78,7 @@ an offline cache, a tracker blocklist, and a speech engine of our own.
 Source: User request on 2026-11-15.
 
 Consequence: Vision, use cases, requirements, architecture, and UI
-design describe this client. There is still no application code.
+design describe this client. The program is `src/`.
 
 ### D-0004
 
@@ -107,8 +106,8 @@ login, Howler, and a `SpeechRecognition` constructor.
 
 Source: User request on 2026-11-15.
 
-Consequence: Implementation uses Electron 45. Node.js and Electron
-join the devshell in that implementation change
+Consequence: Implementation uses Electron 45. Node.js 24 and
+Electron 45.3.3 are in the devshell
 ([D-0006](#d-0006), [D-0011](#d-0011)).
 
 ### D-0005
@@ -132,13 +131,21 @@ Status: Decided
 
 Choice: `devShells.default` exists for `x86_64-linux` and
 `aarch64-linux`. Packages: `bashInteractive`, `zsh`, `git`, `curl`,
-`cacert`, `coreutils`, `python3`. No `shellHook`.
+`cacert`, `coreutils`, `python3`, `nodejs_24`, and Electron 45.3.3.
+No `shellHook`. The shell sets `ELECTRON_OVERRIDE_DIST_PATH` to that
+Electron dist directory and `ELECTRON_SKIP_BINARY_DOWNLOAD=1`.
 
-Source: Bootstrap procedure. Node.js and Electron 45 are added with
-the implementation ([D-0011](#d-0011)).
+nixos-26.05 has no `electron_45` attribute. The devshell builds
+45.3.3 with the channel's electron binary builder
+([P-0011](pitfalls.md#p-0011)).
+
+Source: Bootstrap procedure, then the implementation on 2026-11-15
+([D-0011](#d-0011)).
 
 Consequence: The Cursor shell hook and the editor terminal both enter
-this shell. It is impure ([P-0005](pitfalls.md#p-0005)).
+this shell. It is impure ([P-0005](pitfalls.md#p-0005)). `npm start`
+and `npm test` run here. The npm `electron` package must not
+download its own binary ([P-0011](pitfalls.md#p-0011)).
 
 ### D-0007
 
@@ -146,13 +153,14 @@ Status: Decided
 
 Choice: Recommended extensions are `jnoortheen.nix-ide`,
 `editorconfig.editorconfig`, and `DavidAnson.vscode-markdownlint`.
+The editor's built-in JavaScript support covers `src/` and `test/`.
 
 Source: Bootstrap procedure. Those three match `flake.nix`,
-`.editorconfig`, and the doc suite. No JavaScript extension until
-the tree has JavaScript to edit.
+`.editorconfig`, and the doc suite.
 
 Consequence: The reasons are in [operations](operations.md).
-`.vscode/extensions.json` is the list.
+`.vscode/extensions.json` is the list. No extra JavaScript
+extension is recommended.
 
 ### D-0008
 
@@ -195,7 +203,7 @@ Source: Bootstrap completion. [D-0007](#d-0007) includes the
 EditorConfig extension so shared defaults exist.
 
 Consequence: Editors that honor EditorConfig share those defaults.
-No language-specific section until source files exist.
+JavaScript uses the root section.
 
 ### D-0011
 
@@ -209,11 +217,10 @@ Source: User request on 2026-11-15.
 <https://releases.electronjs.org/?channel=stable> listed 45.3.3 as
 the stable release that day.
 
-Consequence: Implementation targets Electron 45. Email login, one
-wrong card, and one correct card are confirmed on that major before
-the port is treated as done ([P-0006](pitfalls.md#p-0006)). Node.js
-and the `electron` package join the devshell in the implementation
-change ([D-0006](#d-0006)).
+Consequence: The shell targets Electron 45.3.3. Node.js 24 and that
+Electron are in the devshell ([D-0006](#d-0006),
+[P-0011](pitfalls.md#p-0011)). Email login and the flashcards passed
+on this build ([P-0006](pitfalls.md#p-0006)).
 
 ### D-0012
 

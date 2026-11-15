@@ -11,7 +11,7 @@ function targetArches(targets, name) {
 
 test("release packages are unsigned and cover both arches", () => {
   const build = pkg.build;
-  assert.equal(pkg.version, "0.1.0");
+  assert.equal(pkg.version, "0.4.0");
   assert.equal(pkg.license, "GPL-3.0-only");
   assert.equal(pkg.devDependencies["electron-builder"], "26.18.0");
   assert.equal(build.electronVersion, "45.3.3");

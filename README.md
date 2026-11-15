@@ -8,8 +8,6 @@ the login, and a shorter pause after a correct answer.
 
 This is an independent client. Lingvist is a trademark of its owner.
 
-![lv-desktop icon, a cream card on navy](assets/icon.png)
-
 ## What it does
 
 - Opens the study site in one window.
@@ -36,7 +34,7 @@ account to study.
 
 ## Install
 
-GitHub release `v0.1.0` and later has one package per system and
+GitHub release `v0.4.0` has one package per system and
 processor. amd64 is the Intel or AMD 64-bit build. aarch64 is the
 ARM 64-bit build.
 

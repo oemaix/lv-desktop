@@ -354,6 +354,12 @@ test("popups stay in-app only for about:blank and login hosts", () => {
   const script = open({ url: "javascript:alert(1)" });
   assert.equal(script.action, "deny");
 
+  const study = open({ url: "https://learn.lingvist.com/#hub" });
+  assert.equal(study.action, "deny");
+  assert.equal(loaded.windows.length, 1);
+  assert.equal(loaded.windows[0].loadedURL, "https://learn.lingvist.com/#hub");
+  assert.equal(loaded.windows[0].focused, true);
+
   assert.deepEqual(loaded.opened, ["https://help.lingvist.com/hc"]);
   fs.rmSync(loaded.directory, { recursive: true, force: true });
 });
@@ -417,9 +423,20 @@ test("the microphone is one prompt, and camera, notifications, and geolocation a
     true,
   );
 
+  for (const permission of ["fullscreen", "clipboard-sanitized-write", "persistent-storage"]) {
+    let granted = "unset";
+    request(contents, permission, (value) => {
+      granted = value;
+    }, {});
+    assert.equal(granted, true, permission);
+    assert.equal(check(contents, permission, "https://learn.lingvist.com", {}), true, permission);
+  }
+
   for (const [permission, details] of [
     ["notifications", {}],
     ["geolocation", {}],
+    ["display-capture", {}],
+    ["usb", {}],
     ["media", { ...audio, mediaTypes: ["video"] }],
     ["media", { ...audio, mediaTypes: ["audio", "video"] }],
     ["media", { ...audio, isMainFrame: false }],
@@ -434,7 +451,7 @@ test("the microphone is one prompt, and camera, notifications, and geolocation a
   fs.rmSync(loaded.directory, { recursive: true, force: true });
 });
 
-test("a stored microphone denial is not asked again", async () => {
+test("a microphone denial is asked again, and a stored allow is not", async () => {
   fs.mkdirSync(scratchRoot, { recursive: true });
   const directory = fs.mkdtempSync(path.join(scratchRoot, "user-"));
   const first = loadMain({ permissionResponse: 1, userData: directory });
@@ -446,28 +463,45 @@ test("a stored microphone denial is not asked again", async () => {
     mediaTypes: ["audio"],
   };
 
+  let firstGrant = "unset";
   await new Promise((resolve) => {
-    first.sessionState.permissionHandlers.request(first.windows[0].webContents, "media", resolve, audio);
-  });
-  assert.equal(first.prompts.length, 1);
-
-  const second = loadMain({ permissionResponse: 0, userData: directory });
-  second.ready();
-  let granted = "unset";
-  await new Promise((resolve) => {
-    second.sessionState.permissionHandlers.request(second.windows[0].webContents, "media", (value) => {
-      granted = value;
+    first.sessionState.permissionHandlers.request(first.windows[0].webContents, "media", (value) => {
+      firstGrant = value;
       resolve();
     }, audio);
   });
+  assert.equal(firstGrant, false);
+  assert.equal(first.prompts.length, 1);
+  assert.equal(fs.existsSync(path.join(directory, "microphone.json")), false);
 
-  assert.equal(granted, false);
-  assert.equal(second.prompts.length, 0);
-  assert.equal(second.sessionState.permissionHandlers.check(
-    second.windows[0].webContents,
+  const second = loadMain({ permissionResponse: 0, userData: directory });
+  second.ready();
+  let secondGrant = "unset";
+  await new Promise((resolve) => {
+    second.sessionState.permissionHandlers.request(second.windows[0].webContents, "media", (value) => {
+      secondGrant = value;
+      resolve();
+    }, audio);
+  });
+  assert.equal(secondGrant, true);
+  assert.equal(second.prompts.length, 1);
+
+  const third = loadMain({ permissionResponse: 1, userData: directory });
+  third.ready();
+  let thirdGrant = "unset";
+  await new Promise((resolve) => {
+    third.sessionState.permissionHandlers.request(third.windows[0].webContents, "media", (value) => {
+      thirdGrant = value;
+      resolve();
+    }, audio);
+  });
+  assert.equal(thirdGrant, true);
+  assert.equal(third.prompts.length, 0);
+  assert.equal(third.sessionState.permissionHandlers.check(
+    third.windows[0].webContents,
     "media",
     "https://learn.lingvist.com",
     { ...audio, mediaTypes: undefined, mediaType: "audio" },
-  ), false);
+  ), true);
   fs.rmSync(directory, { recursive: true, force: true });
 });

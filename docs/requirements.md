@@ -99,8 +99,10 @@ and the original 500ms returns. The cards keep working.
 ## Permissions
 
 Microphone: one prompt, audio only, main frame, origin
-`https://learn.lingvist.com`. Camera, notifications, and geolocation
-are denied.
+`https://learn.lingvist.com`. An allow is stored in `userData`. A
+deny is asked again on the next request. Camera, notifications, and
+geolocation are denied. Fullscreen, clipboard write, and persistent
+storage stay available. Other device permissions stay denied.
 
 ## Links
 
@@ -126,7 +128,8 @@ main-frame navigation goes to the system browser. `http:`, `file:`,
 Apple sign-in is a full-page redirect to `appleid.apple.com` and
 back to `learn.lingvist.com/oauth.html`. Facebook, Weibo, and Feide
 post the result to `window.opener` from that OAuth page, so those
-popups are real child windows.
+popups are real child windows. `window.open` of the study origin
+loads in the existing window.
 
 Payment hosts are not on the in-app list. Checkout is not this
 program.

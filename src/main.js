@@ -4,7 +4,8 @@ const path = require("node:path");
 const {
   chromeUserAgent,
   classifyNavigation,
-  isMicrophoneRequest,
+  classifyPermission,
+  classifyWindowOpen,
   studyOrigin,
   studyUrl,
 } = require("./policy");
@@ -35,8 +36,8 @@ function rememberedMicrophone() {
     decisionAllow = null;
     try {
       const parsed = JSON.parse(fs.readFileSync(microphoneDecisionPath(), "utf8"));
-      if (parsed && typeof parsed.allow === "boolean") {
-        decisionAllow = parsed.allow;
+      if (parsed && parsed.allow === true) {
+        decisionAllow = true;
       }
     } catch {
       decisionAllow = null;
@@ -58,9 +59,8 @@ function rememberMicrophone(allow) {
 }
 
 function askMicrophone(webContents) {
-  const remembered = rememberedMicrophone();
-  if (typeof remembered === "boolean") {
-    return Promise.resolve(remembered);
+  if (rememberedMicrophone() === true) {
+    return Promise.resolve(true);
   }
   if (!pendingPrompt) {
     const options = {
@@ -78,7 +78,9 @@ function askMicrophone(webContents) {
     pendingPrompt = Promise.resolve(prompt)
       .then((result) => {
         const allow = result.response === 0;
-        rememberMicrophone(allow);
+        if (allow) {
+          rememberMicrophone(true);
+        }
         return allow;
       })
       .catch(() => false)
@@ -89,9 +91,9 @@ function askMicrophone(webContents) {
   return pendingPrompt;
 }
 
-function microphoneDetails(requestingOrigin, details) {
+function permissionRequest(permission, requestingOrigin, details) {
   return {
-    permission: "media",
+    permission,
     isMainFrame: details && details.isMainFrame,
     requestingOrigin,
     requestingUrl: details && details.requestingUrl,
@@ -103,21 +105,23 @@ function microphoneDetails(requestingOrigin, details) {
 
 function installPermissionHandlers() {
   session.defaultSession.setPermissionCheckHandler((webContents, permission, requestingOrigin, details) => {
-    if (!webContents || permission !== "media") {
-      return false;
+    const decision = classifyPermission(permissionRequest(permission, requestingOrigin, details));
+    if (decision === "allow") {
+      return true;
     }
-    const request = microphoneDetails(requestingOrigin, details);
-    request.permission = permission;
-    if (!isMicrophoneRequest(request)) {
+    if (!webContents || decision !== "microphone") {
       return false;
     }
     return rememberedMicrophone() === true;
   });
 
   session.defaultSession.setPermissionRequestHandler((webContents, permission, callback, details) => {
-    const request = microphoneDetails(undefined, details);
-    request.permission = permission;
-    if (!webContents || !isMicrophoneRequest(request)) {
+    const decision = classifyPermission(permissionRequest(permission, undefined, details));
+    if (decision === "allow") {
+      callback(true);
+      return;
+    }
+    if (!webContents || decision !== "microphone") {
       callback(false);
       return;
     }
@@ -177,11 +181,25 @@ function installTimer(contents) {
   }
 }
 
+function openInMainWindow(url) {
+  if (!mainWindow || mainWindow.isDestroyed()) {
+    return;
+  }
+  const loading = mainWindow.loadURL(url);
+  if (loading && typeof loading.catch === "function") {
+    loading.catch(() => {});
+  }
+  focusMainWindow();
+}
+
 function attachContents(contents) {
   contents.setWindowOpenHandler((details) => {
-    const decision = classifyNavigation(details && details.url, { popup: true });
+    const decision = classifyWindowOpen(details && details.url);
     if (decision === "external") {
       openInSystemBrowser(details.url);
+    }
+    if (decision === "main") {
+      openInMainWindow(details.url);
     }
     if (decision !== "allow") {
       return { action: "deny" };

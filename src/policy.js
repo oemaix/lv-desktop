@@ -64,6 +64,55 @@ function isAudioOnly(request) {
   return request.mediaType === "audio";
 }
 
+const grantedPermissions = new Set([
+  "fullscreen",
+  "clipboard-sanitized-write",
+  "persistent-storage",
+  "pointerLock",
+]);
+
+const deniedPermissions = new Set([
+  "notifications",
+  "geolocation",
+  "geolocation-approximate",
+  "camera",
+  "display-capture",
+]);
+
+function isStudyHost(hostname) {
+  const host = String(hostname).toLowerCase();
+  return host === "learn.lingvist.com" || host.endsWith(".learn.lingvist.com");
+}
+
+function classifyWindowOpen(rawUrl) {
+  const decision = classifyNavigation(rawUrl, { popup: true });
+  if (decision !== "allow") {
+    return decision;
+  }
+  try {
+    const url = new URL(rawUrl);
+    if (url.protocol === "https:" && isStudyHost(url.hostname)) {
+      return "main";
+    }
+  } catch {
+    return "drop";
+  }
+  return "allow";
+}
+
+function classifyPermission(request) {
+  if (request.permission === "media") {
+    return isMicrophoneRequest(request) ? "microphone" : "deny";
+  }
+  if (deniedPermissions.has(request.permission)) {
+    return "deny";
+  }
+  if (grantedPermissions.has(request.permission)) {
+    return "allow";
+  }
+  return "deny";
+}
+
 function isMicrophoneRequest(request) {
   if (request.permission !== "media" || request.isMainFrame !== true) {
     return false;
@@ -88,5 +137,7 @@ module.exports = {
   inAppHosts,
   chromeUserAgent,
   classifyNavigation,
+  classifyPermission,
+  classifyWindowOpen,
   isMicrophoneRequest,
 };

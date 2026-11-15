@@ -9,8 +9,8 @@ Status: the shell in `src/` is this process. The shell is Electron 45
 
 One Electron 45 main process. One window. No packaged UI.
 `src/main.js` is this process. `src/timer-wrapper.js` is the only
-page script. `src/policy.js` decides hosts, schemes, and the
-microphone.
+page script. `src/policy.js` decides hosts, schemes, permissions,
+and which `window.open` stays a child window.
 
 ```text
 BrowserWindow  https://learn.lingvist.com/
@@ -21,8 +21,9 @@ BrowserWindow  https://learn.lingvist.com/
 
 `contextIsolation` is on, `nodeIntegration` is off, and `sandbox` is
 on. There is no preload API. On uid 0, Chromium exits before the
-main script, so `npm start` passes `--no-sandbox` only in that case
-([P-0012](pitfalls.md#p-0012)). The timer wrapper is the only script the
+main script, so `npm start` passes `--no-sandbox` only in that case.
+That switch turns the OS sandbox off. The preference does not turn
+it back on ([P-0012](pitfalls.md#p-0012)). The timer wrapper is the only script the
 shell puts in the page. It is installed with
 `webContents.executeJavaScript` on `dom-ready`, in the page world
 ([D-0013](decisions.md#d-0013), [P-0007](pitfalls.md#p-0007)).
@@ -40,9 +41,12 @@ removed and the Chrome version kept. The spellchecker is off. The
 menu is empty ([D-0014](decisions.md#d-0014)).
 
 Permission checks allow one microphone prompt and deny camera,
-notifications, and geolocation. That answer is stored in `userData`.
-The host list and the scheme rules are in
-[requirements](requirements.md#links).
+notifications, and geolocation. An allow is stored in `userData`. A
+deny is asked again. Fullscreen, clipboard write, and persistent
+storage stay available ([P-0013](pitfalls.md#p-0013)). A
+`window.open` of the study origin loads in this window
+([P-0014](pitfalls.md#p-0014)). The host list and the scheme rules
+are in [requirements](requirements.md#links).
 
 ## What is not in this process
 

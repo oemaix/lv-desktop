@@ -3,6 +3,8 @@ const test = require("node:test");
 const {
   chromeUserAgent,
   classifyNavigation,
+  classifyPermission,
+  classifyWindowOpen,
   isMicrophoneRequest,
   studyOrigin,
 } = require("../src/policy");
@@ -73,6 +75,42 @@ test("about:blank is allowed only as a popup", () => {
   assert.equal(classifyNavigation("about:blank#ignored"), "drop");
   assert.equal(classifyNavigation("about:blank", { popup: true }), "allow");
   assert.equal(classifyNavigation("about:blank#ignored", { popup: true }), "allow");
+});
+
+test("the study site stays in the one window, and OAuth popups stay child windows", () => {
+  assert.equal(classifyWindowOpen("https://learn.lingvist.com/#hub"), "main");
+  assert.equal(classifyWindowOpen("https://www.learn.lingvist.com/"), "main");
+  assert.equal(classifyWindowOpen("about:blank"), "allow");
+  assert.equal(classifyWindowOpen("https://www.facebook.com/v18.0/dialog/oauth"), "allow");
+  assert.equal(classifyWindowOpen("https://accounts.google.com/o/oauth2/v2/auth"), "allow");
+  assert.equal(classifyWindowOpen("https://auth.dataporten.no/oauth/authorization"), "allow");
+  assert.equal(classifyWindowOpen("https://help.lingvist.com/hc"), "external");
+  assert.equal(classifyWindowOpen("javascript:alert(1)"), "drop");
+});
+
+test("page permissions keep clipboard and fullscreen, and deny camera and location", () => {
+  assert.equal(classifyPermission({ permission: "fullscreen" }), "allow");
+  assert.equal(classifyPermission({ permission: "clipboard-sanitized-write" }), "allow");
+  assert.equal(classifyPermission({ permission: "persistent-storage" }), "allow");
+  assert.equal(classifyPermission({ permission: "pointerLock" }), "allow");
+  assert.equal(classifyPermission({ permission: "notifications" }), "deny");
+  assert.equal(classifyPermission({ permission: "geolocation" }), "deny");
+  assert.equal(classifyPermission({ permission: "geolocation-approximate" }), "deny");
+  assert.equal(classifyPermission({ permission: "camera" }), "deny");
+  assert.equal(classifyPermission({ permission: "display-capture" }), "deny");
+  assert.equal(classifyPermission({ permission: "usb" }), "deny");
+  assert.equal(classifyPermission({
+    permission: "media",
+    isMainFrame: true,
+    requestingUrl: "https://learn.lingvist.com/#guess",
+    mediaTypes: ["audio"],
+  }), "microphone");
+  assert.equal(classifyPermission({
+    permission: "media",
+    isMainFrame: true,
+    requestingUrl: "https://learn.lingvist.com/#guess",
+    mediaTypes: ["video"],
+  }), "deny");
 });
 
 test("microphone permission is audio only on the study origin main frame", () => {

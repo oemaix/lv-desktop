@@ -1,6 +1,6 @@
 # Pitfalls
 
-Status: binding. The next id is P-0013. Do not reuse or renumber an id.
+Status: binding. The next id is P-0015. Do not reuse or renumber an id.
 
 ## Index
 
@@ -18,6 +18,8 @@ Status: binding. The next id is P-0013. Do not reuse or renumber an id.
 | [P-0010](#p-0010) | [Operations](operations.md#devshell) | Rootless uid 0 hides the dev home |
 | [P-0011](#p-0011) | [D-0006](decisions.md#d-0006) | Use the devshell Electron 45 binary |
 | [P-0012](#p-0012) | [P-0010](#p-0010) | Electron 45 will not start as uid 0 |
+| [P-0013](#p-0013) | [D-0014](decisions.md#d-0014) | Do not deny every other permission |
+| [P-0014](#p-0014) | [D-0012](decisions.md#d-0012) | The study origin stays in one window |
 
 ## P-0001
 
@@ -142,8 +144,27 @@ This Dev Container is uid 0 ([P-0010](#p-0010)).
 That check runs in C++ before the main script, so
 `app.commandLine.appendSwitch` is too late. `npm start` runs
 `scripts/start.js`, which puts `--no-sandbox` on the command line
-only when `getuid()` is 0. `webPreferences.sandbox` stays on. A
-normal account does not pass that switch, so the process sandbox
-stays on there.
+only when `getuid()` is 0. That switch turns the OS sandbox off.
+`webPreferences.sandbox` does not turn it back on. Context isolation
+and `nodeIntegration: false` still apply. A normal account does not
+pass that switch, so the process sandbox stays on there.
 
 Depends on [P-0010](#p-0010) and [D-0012](decisions.md#d-0012).
+
+## P-0013
+
+Do not answer every permission check with a denial except the
+microphone. The session handler replaces Chromium's own decision.
+Camera, notifications, and geolocation are the denials. Fullscreen,
+clipboard write, and persistent storage stay available. Other device
+permissions, such as USB and screen capture, stay denied.
+
+Depends on [D-0014](decisions.md#d-0014).
+
+## P-0014
+
+Do not open a second window for the study origin. `window.open` of
+`learn.lingvist.com` loads in the existing window. `about:blank` and
+the OAuth hosts that post to `window.opener` stay child windows.
+
+Depends on [D-0012](decisions.md#d-0012).

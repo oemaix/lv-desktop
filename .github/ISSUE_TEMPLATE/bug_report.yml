@@ -1,0 +1,31 @@
+name: Bug report
+description: The window did something unexpected
+body:
+  - type: textarea
+    id: happened
+    attributes:
+      label: What happened
+      description: What you did, and what the window did.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps
+      description: How to see it again.
+    validations:
+      required: true
+  - type: input
+    id: system
+    attributes:
+      label: System
+      description: Operating system, and the command you used to start the app.
+      placeholder: Fedora 43, npm start
+    validations:
+      required: true

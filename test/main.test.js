@@ -259,6 +259,8 @@ test("the app waits until it is ready, then opens one isolated study window", ()
     "sandbox",
   ]);
   assert.equal(win.options.webPreferences.preload, undefined);
+  assert.equal(win.options.icon, path.join(__dirname, "..", "assets", "icon.png"));
+  assert.equal(fs.existsSync(win.options.icon), true);
   assert.equal(win.loadedURL, "https://learn.lingvist.com/");
   assert.equal(win.menu, null);
   assert.equal(loaded.applicationMenu(), null);

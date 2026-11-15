@@ -56,6 +56,13 @@ devshell's Electron 45.3.3. This Dev Container is uid 0, so
 `npm start` adds `--no-sandbox` before Electron's startup check
 ([P-0012](pitfalls.md#p-0012)). `electron .` alone exits here.
 
+## CI
+
+GitHub Actions runs `npm test` on Ubuntu with Node.js 24 for every
+push and pull request. The workflow is
+`.github/workflows/test.yml`. It checks the shell. It does not
+launch Electron.
+
 ## Editor extensions
 
 | Extension | Why it is required |

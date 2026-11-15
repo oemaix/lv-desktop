@@ -8,6 +8,7 @@ Status: the shell in `src/` is this process. The shell is Electron 45
 ## Process
 
 One Electron 45 main process. One window. No packaged UI.
+The window icon is `assets/icon.png`.
 `src/main.js` is this process. `src/timer-wrapper.js` is the only
 page script. `src/policy.js` decides hosts, schemes, permissions,
 and which `window.open` stays a child window.

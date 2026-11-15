@@ -11,10 +11,11 @@ large display, driven by a keyboard.
 
 ## The window
 
-One window. The menu bar is empty, so arrows, space, and enter reach
-the page ([P-0009](pitfalls.md#p-0009)). The session spellchecker is
-off, so the desktop does not draw red underlines in the answer
-field.
+One window. Its icon is a cream card on a navy field
+(`assets/icon.png`). The menu bar is empty, so arrows, space, and
+enter reach the page ([P-0009](pitfalls.md#p-0009)). The session
+spellchecker is off, so the desktop does not draw red underlines in
+the answer field.
 
 A second launch focuses this window. It does not open another one.
 

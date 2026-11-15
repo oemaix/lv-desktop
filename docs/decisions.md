@@ -1,7 +1,8 @@
 # Decisions
 
-Status: scope, engine, and release are decided ([D-0003](#d-0003),
-[D-0004](#d-0004), [D-0011](#d-0011)).
+Status: scope, engine, release, and license are decided
+([D-0003](#d-0003), [D-0004](#d-0004), [D-0011](#d-0011),
+[D-0015](#d-0015)).
 
 Ids stay `D-xxxx`. The next id is one greater than the highest id in
 this file. Never reuse or renumber an id. Closing a decision moves
@@ -25,6 +26,7 @@ that entry from Undecided to Decided and does not change its id.
 | [D-0012](#d-0012) | One window, isolated page, one script |
 | [D-0013](#d-0013) | Correct-answer hold becomes 100ms |
 | [D-0014](#d-0014) | Session, permissions, and link policy |
+| [D-0015](#d-0015) | GNU GPL version 3 only |
 
 ### D-0001
 
@@ -285,6 +287,19 @@ and the reason request filtering is rejected are in
 Consequence: Payment and help leave the app, because their hosts are
 not in-app hosts. Card JSON, progress sync, and audio stay ordinary
 page loads ([P-0008](pitfalls.md#p-0008)).
+
+### D-0015
+
+Status: Decided
+
+Choice: The project is licensed under the GNU General Public License
+version 3 only. The license text is `LICENSE`. The SPDX identifier
+is `GPL-3.0-only`.
+
+Source: User request on 2026-11-15.
+
+Consequence: `package.json` names that identifier. The README states
+it. Contributions stay under the same license.
 
 ## Undecided
 

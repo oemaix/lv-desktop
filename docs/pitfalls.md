@@ -1,6 +1,6 @@
 # Pitfalls
 
-Status: binding. The next id is P-0023. Do not reuse or renumber an id.
+Status: binding. The next id is P-0025. Do not reuse or renumber an id.
 
 ## Index
 
@@ -28,6 +28,8 @@ Status: binding. The next id is P-0023. Do not reuse or renumber an id.
 | [P-0020](#p-0020) | [D-0019](decisions.md#d-0019) | Night colors follow the local clock |
 | [P-0021](#p-0021) | [D-0019](decisions.md#d-0019) | The header mark's fill is an attribute |
 | [P-0022](#p-0022) | [D-0019](decisions.md#d-0019) | The translation fold mark's fill is an attribute |
+| [P-0023](#p-0023) | [D-0006](decisions.md#d-0006) | A variable in the terminal path hides the profile |
+| [P-0024](#p-0024) | [D-0006](decisions.md#d-0006) | A missing zsh rc makes terminal exit return 1 |
 
 ## P-0001
 
@@ -270,3 +272,28 @@ control. Paint those paths with the night ink. Leave the grammar
 arrow and the rail icons alone. The rule leaves with the night sheet.
 
 Depends on [D-0019](decisions.md#d-0019).
+
+## P-0023
+
+Do not set `terminal.integrated.profiles.linux` or
+`terminal.integrated.profiles.osx` `path` to
+`${workspaceFolder}/.vscode/nix-develop-terminal.sh`. The editor
+checks that this path exists before it expands the variable, then
+drops the profile. "Nix Develop" is then missing from the terminal
+list, and a new terminal falls back to the container shell. Set
+`path` to `/bin/sh`, pass the script in `args`, and set
+`overrideName` so the tab title is "Nix Develop".
+
+Depends on [D-0006](decisions.md#d-0006).
+
+## P-0024
+
+Nix zsh runs `zsh-newuser-install` when the account has no `.zshenv`,
+`.zprofile`, `.zshrc`, or `.zlogin`. That function returns 1 when it
+does not open its wizard. A later plain `exit` keeps status 1, and
+the editor reports that the terminal terminated with exit code 1.
+When those files are absent, `.vscode/nix-develop-terminal.sh` sets
+`ZDOTDIR` to `.vscode/zsh`, whose `.zshrc` succeeds. Leave an
+account's own zsh startup files in place.
+
+Depends on [D-0006](decisions.md#d-0006).

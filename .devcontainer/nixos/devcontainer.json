@@ -33,9 +33,8 @@
         "terminal.integrated.defaultProfile.linux": "Nix Develop",
         "terminal.integrated.profiles.linux": {
           "Nix Develop": {
-            "path": "nix",
-            "args": ["develop", "--command", "zsh"],
-            "cwd": "${workspaceFolder}",
+            "path": "/bin/sh",
+            "args": ["${workspaceFolder}/.vscode/nix-develop-terminal.sh"],
             "overrideName": true
           }
         }

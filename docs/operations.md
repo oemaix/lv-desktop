@@ -32,10 +32,16 @@ If `flake.nix` is not in the Git index yet, stage `flake.nix` and
 ([P-0001](pitfalls.md#p-0001)). A clone that already contains those
 files does not need that step.
 
-The default terminal profile on Linux and macOS is "Nix Develop". It
-runs `.vscode/nix-develop-terminal.sh`, which moves to the repository
+The default terminal profile on Linux and macOS is "Nix Develop".
+Its `path` is `/bin/sh`, and its arguments are
+`.vscode/nix-develop-terminal.sh`. The script moves to the repository
 root and executes `nix develop -c zsh`, or bash when the host has no
-zsh. Task automation is not pointed at that script.
+zsh. When that account has no zsh startup file, the script sets
+`ZDOTDIR` to `.vscode/zsh` so closing the terminal is a zero exit
+([P-0024](pitfalls.md#p-0024)). The tab title is "Nix Develop". Task automation is not pointed
+at that script. A profile path that still contains
+`${workspaceFolder}` is dropped from the terminal list
+([P-0023](pitfalls.md#p-0023)).
 
 A Dev Container is optional. The flake is still the environment.
 Opening the folder on the host without Docker leaves this shell and

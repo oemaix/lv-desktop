@@ -3,12 +3,16 @@
   "terminal.integrated.defaultProfile.osx": "Nix Develop",
   "terminal.integrated.profiles.linux": {
     "Nix Develop": {
-      "path": "${workspaceFolder}/.vscode/nix-develop-terminal.sh"
+      "path": "/bin/sh",
+      "args": ["${workspaceFolder}/.vscode/nix-develop-terminal.sh"],
+      "overrideName": true
     }
   },
   "terminal.integrated.profiles.osx": {
     "Nix Develop": {
-      "path": "${workspaceFolder}/.vscode/nix-develop-terminal.sh"
+      "path": "/bin/sh",
+      "args": ["${workspaceFolder}/.vscode/nix-develop-terminal.sh"],
+      "overrideName": true
     }
   }
 }

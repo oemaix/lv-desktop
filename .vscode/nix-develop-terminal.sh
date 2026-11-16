@@ -6,6 +6,13 @@
 set -eu
 root=$(CDPATH= cd -- "$(dirname "$0")/.." && pwd)
 cd "$root"
+zhome=${ZDOTDIR:-$HOME}
+if [ ! -f "$zhome/.zshenv" ] && [ ! -f "$zhome/.zprofile" ] && [ ! -f "$zhome/.zshrc" ] && [ ! -f "$zhome/.zlogin" ]; then
+  # Nix zsh runs zsh-newuser-install when these files are absent.
+  # That function returns 1, and a later plain exit keeps that status.
+  ZDOTDIR=$root/.vscode/zsh
+  export ZDOTDIR
+fi
 if command -v zsh >/dev/null 2>&1 || [ -x /usr/bin/zsh ] || [ -x /bin/zsh ]; then
   exec nix develop -c zsh
 fi

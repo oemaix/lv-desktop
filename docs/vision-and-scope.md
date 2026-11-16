@@ -36,7 +36,8 @@ after a correct answer.
 
 - Subscription, checkout, plan changes, and receipts.
 - A second scheduler.
-- A theme, or any packaged UI of our own.
+- Any color theme besides the night treatment
+  ([D-0017](decisions.md#d-0017)), or any packaged UI of our own.
 - Global hotkeys.
 - An offline cache.
 - A tracker blocklist.

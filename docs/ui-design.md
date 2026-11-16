@@ -5,9 +5,19 @@ Status: the page is the UI ([D-0003](decisions.md#d-0003),
 
 ## No packaged UI
 
-The shell ships no screens of its own. There is no theme and no
-touch layout. The Lingvist page is the whole study surface, on a
-large display, driven by a keyboard.
+The shell ships no screens of its own. There is no theme picker and
+no touch layout. The Lingvist page is the whole study surface, on a
+large display, driven by a keyboard. Its colors are shifted to night
+([D-0017](decisions.md#d-0017), [D-0019](decisions.md#d-0019)).
+That shift keeps each page hue. It is on from 20:00 to 06:00 local
+time, and it is removed when the page has night colors of its own.
+The mark in the navigation header is painted with the night ink for
+that same stretch ([P-0021](pitfalls.md#p-0021)). The control that
+folds the sentence translation takes that ink as well
+([P-0022](pitfalls.md#p-0022)). The
+send-feedback control is hidden. The shell presses the page's
+"OK, got it" button ([D-0018](decisions.md#d-0018)). The reCAPTCHA
+badge stays.
 
 ## The window
 

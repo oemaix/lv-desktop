@@ -9,9 +9,11 @@ Status: the shell in `src/` is this process. The shell is Electron 45
 
 One Electron 45 main process. One window. No packaged UI.
 The window icon is `assets/icon.png`.
-`src/main.js` is this process. `src/timer-wrapper.js` is the only
-page script. `src/policy.js` decides hosts, schemes, permissions,
-and which `window.open` stays a child window.
+`src/main.js` is this process. `src/study-notices.js`,
+`src/timer-wrapper.js`, and `src/night-theme.js` are the page
+scripts. `src/policy.js` decides
+hosts, schemes, permissions, and which `window.open` stays a child
+window.
 
 ```text
 BrowserWindow  https://learn.lingvist.com/
@@ -24,10 +26,12 @@ BrowserWindow  https://learn.lingvist.com/
 on. There is no preload API. On uid 0, Chromium exits before the
 main script, so `npm start` passes `--no-sandbox` only in that case.
 That switch turns the OS sandbox off. The preference does not turn
-it back on ([P-0012](pitfalls.md#p-0012)). The timer wrapper is the only script the
-shell puts in the page. It is installed with
-`webContents.executeJavaScript` on `dom-ready`, in the page world
-([D-0013](decisions.md#d-0013), [P-0007](pitfalls.md#p-0007)).
+it back on ([P-0012](pitfalls.md#p-0012)). The shell puts three
+scripts in the study page, each with `webContents.executeJavaScript`
+on `dom-ready`, in the page world. One presses the consent button
+and hides send feedback ([D-0018](decisions.md#d-0018)). One is the
+night colors ([D-0017](decisions.md#d-0017)). One is the timer
+wrapper ([D-0013](decisions.md#d-0013), [P-0007](pitfalls.md#p-0007)).
 
 The page keeps the card loop, the hints, the audio, and the
 scheduling. Card JSON, progress sync, and audio are ordinary loads.

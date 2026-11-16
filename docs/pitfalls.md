@@ -1,6 +1,6 @@
 # Pitfalls
 
-Status: binding. The next id is P-0017. Do not reuse or renumber an id.
+Status: binding. The next id is P-0023. Do not reuse or renumber an id.
 
 ## Index
 
@@ -22,6 +22,12 @@ Status: binding. The next id is P-0017. Do not reuse or renumber an id.
 | [P-0014](#p-0014) | [D-0012](decisions.md#d-0012) | The study origin stays in one window |
 | [P-0015](#p-0015) | [D-0016](decisions.md#d-0016) | Release packages are built on GitHub Actions |
 | [P-0016](#p-0016) | [D-0016](decisions.md#d-0016) | Do not set `build.license` |
+| [P-0017](#p-0017) | [D-0017](decisions.md#d-0017) | Derive night colors from the live page |
+| [P-0018](#p-0018) | [D-0017](decisions.md#d-0017) | Follow style tags added after the first paint |
+| [P-0019](#p-0019) | [D-0018](decisions.md#d-0018) | Press the consent button, leave reCAPTCHA |
+| [P-0020](#p-0020) | [D-0019](decisions.md#d-0019) | Night colors follow the local clock |
+| [P-0021](#p-0021) | [D-0019](decisions.md#d-0019) | The header mark's fill is an attribute |
+| [P-0022](#p-0022) | [D-0019](decisions.md#d-0019) | The translation fold mark's fill is an attribute |
 
 ## P-0001
 
@@ -190,3 +196,77 @@ package. The SPDX identifier stays in `package.json`. The
 `LICENSE` file is packed through `files` and `extraResources`.
 
 Depends on [D-0016](decisions.md#d-0016).
+
+## P-0017
+
+Do not store Lingvist's current hex colors for the night treatment.
+Read the live stylesheet and keep each color's hue. Do not add a
+second palette. Skip the treatment when the page background is
+already dark, or when the page CSS uses `prefers-color-scheme`.
+Delete `src/night-theme.js` when the official page has night colors.
+
+Depends on [D-0017](decisions.md#d-0017).
+
+## P-0018
+
+Do not treat the one linked stylesheet as the whole page. On
+2026-11-16 a logged-in session had one same-origin CSS file and 193
+style tags in `head`. Those tags held more color declarations than
+the file, and 64 of them were Vue scoped rules. The file name is
+hashed and will change. There was no `prefers-color-scheme` rule.
+`color-scheme` was `normal`. The page background was
+`rgb(238, 240, 244)`, card text was `rgb(44, 49, 67)`, and the
+prompt words were `rgb(3, 120, 137)`.
+
+Copy style tags that appear after the first pass, and keep the
+night sheet last. A dark background caused by that sheet is not
+the official night mode.
+
+Depends on [D-0017](decisions.md#d-0017).
+
+## P-0019
+
+Hide `div.survey` only. Do not hide `div.grecaptcha-badge`, the
+reCAPTCHA iframe, or the reCAPTCHA token field. Press the
+"OK, got it" button inside `section.app-cookie-consent`, and only
+while that notice is shown. Do not press "Find out more". That
+link opens the terms of service. The button stores the consent
+cookie. Do not filter the page's requests
+([P-0008](#p-0008)).
+
+Depends on [D-0018](decisions.md#d-0018).
+
+## P-0020
+
+Use the computer's local clock. Night colors are on from 20:00 to
+06:00 and off from 06:00 to 20:00, including while the page stays
+open. Do not leave the night sheet up during the day. Keep a white
+card lighter than the pale page. Keep a pale tint lighter than that
+card, including a correct-answer wash. Cap the saturation of dark
+colored text and of pale tinted surfaces, so a teal prompt does not
+turn bright cyan and a pale selected control does not turn neon.
+Lift mid-tone colored text so it stays readable on the night card.
+
+Depends on [D-0019](decisions.md#d-0019).
+
+## P-0021
+
+The mark in `.navigation-header` is an inline SVG. On 2026-11-16 its
+two paths set `fill="#2C3143"` as an attribute, so the stylesheet
+rewrite leaves the mark dark on the night rail. Paint those paths
+with the night ink in the night sheet. Do not restyle the other rail
+icons. The orange marks keep their own fills. The rule leaves with
+the night sheet.
+
+Depends on [D-0019](decisions.md#d-0019).
+
+## P-0022
+
+The control that folds the sentence translation is
+`.card-context-translations > .toggle-icon`. On 2026-11-16 its arrow
+path set `fill="#2C3143"` as an attribute, so the night sheet left it
+dark on the night card. `.collapsible-box > .toggle-icon` is the same
+control. Paint those paths with the night ink. Leave the grammar
+arrow and the rail icons alone. The rule leaves with the night sheet.
+
+Depends on [D-0019](decisions.md#d-0019).

@@ -13,4 +13,4 @@ rpm, DMG, and MSI for amd64 and aarch64
 
 ## Next
 
-Dates are not set.
+Nothing is queued.

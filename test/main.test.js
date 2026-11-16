@@ -7,6 +7,8 @@ const vm = require("node:vm");
 const sourcePath = path.join(__dirname, "..", "src", "main.js");
 const mainSource = fs.readFileSync(sourcePath, "utf8");
 const timerSource = fs.readFileSync(path.join(__dirname, "..", "src", "timer-wrapper.js"), "utf8");
+const nightSource = fs.readFileSync(path.join(__dirname, "..", "src", "night-theme.js"), "utf8");
+const noticeSource = fs.readFileSync(path.join(__dirname, "..", "src", "study-notices.js"), "utf8");
 const scratchRoot = path.join(__dirname, "..", "tmp", "test-userdata");
 
 function loadMain({ lock = true, permissionResponse = 0, userData } = {}) {
@@ -366,17 +368,17 @@ test("popups stay in-app only for about:blank and login hosts", () => {
   fs.rmSync(loaded.directory, { recursive: true, force: true });
 });
 
-test("the timer wrapper is installed on the study page", () => {
+test("the page scripts are installed on the study page", () => {
   const loaded = loadMain();
   loaded.ready();
   const contents = loaded.windows[0].webContents;
 
   contents.handlers.get("dom-ready")();
-  assert.deepEqual(contents.scripts, [timerSource]);
+  assert.deepEqual(contents.scripts, [noticeSource, nightSource, timerSource]);
 
   loaded.windows[0].loadedURL = "https://accounts.google.com/";
   contents.handlers.get("dom-ready")();
-  assert.equal(contents.scripts.length, 1);
+  assert.equal(contents.scripts.length, 3);
   fs.rmSync(loaded.directory, { recursive: true, force: true });
 });
 

@@ -2,7 +2,9 @@
 
 Status: required shell behavior, implemented in `src/`
 ([D-0003](decisions.md#d-0003), [D-0012](decisions.md#d-0012),
-[D-0013](decisions.md#d-0013), [D-0014](decisions.md#d-0014)). The
+[D-0013](decisions.md#d-0013), [D-0014](decisions.md#d-0014),
+[D-0017](decisions.md#d-0017), [D-0018](decisions.md#d-0018),
+[D-0019](decisions.md#d-0019)). The
 shell is Electron 45 ([D-0011](decisions.md#d-0011)).
 
 The site facts below were measured in a logged-in session on
@@ -137,7 +139,37 @@ program.
 Do not filter requests ([P-0008](pitfalls.md#p-0008)). Card JSON,
 progress sync, and audio are ordinary loads from the page.
 
+## Notices
+
+The study site is Lingvist's. Lingvist's terms and privacy notice
+apply to the account. On the study page, the shell presses the
+"OK, got it" button in the personal-data notice
+([D-0018](decisions.md#d-0018)). That button stores Lingvist's
+consent cookie for one year and hides the notice. The shell does
+not press "Find out more".
+
+The shell hides the send-feedback control. The reCAPTCHA badge and
+its check stay ([P-0019](pitfalls.md#p-0019)).
+
+## Night colors
+
+From 20:00 to 06:00 local time, the study page is shown with night
+colors ([D-0017](decisions.md#d-0017), [D-0019](decisions.md#d-0019)).
+From 06:00 to 20:00 it keeps the page's own colors. The shell
+switches at those hours while the page stays open. Each night color
+keeps the hue of the
+color in the live stylesheets, including the style tags the page
+adds in `head` ([P-0018](pitfalls.md#p-0018)). Light surfaces become
+dark, and dark text becomes light. The mark in the navigation
+header is an inline SVG whose fill is an attribute, so the night
+sheet paints those paths with the night ink
+([P-0021](pitfalls.md#p-0021)). The control that folds the sentence
+translation is the same kind of attribute, so it takes that ink too
+([P-0022](pitfalls.md#p-0022)). The treatment is not applied
+when that page already has a dark background, or when its CSS uses
+`prefers-color-scheme`. There is no other color theme.
+
 ## Not this program
 
-No second scheduler, no theme, no global hotkeys, no offline cache,
-no tracker blocklist, and no speech engine of our own.
+No second scheduler, no other color theme, no global hotkeys, no
+offline cache, no tracker blocklist, and no speech engine of our own.

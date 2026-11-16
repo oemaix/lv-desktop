@@ -7,6 +7,10 @@ the scheduling stay on their site. This program keeps one window,
 the login, and a shorter pause after a correct answer.
 
 This is an independent client. Lingvist is a trademark of its owner.
+The study site is Lingvist's. Lingvist's terms and privacy notice
+apply to the account. This program presses the study page's
+"OK, got it" button. That stores Lingvist's consent cookie for one
+year.
 
 ## What it does
 
@@ -14,6 +18,9 @@ This is an independent client. Lingvist is a trademark of its owner.
 - Keeps you logged in after a restart.
 - Leaves arrows, space, and enter on the cards.
 - Moves on sooner after a correct answer.
+- Shows the study page in night colors from 20:00 to 06:00.
+- Hides Lingvist's send-feedback control.
+- Presses the study page's "OK, got it" button.
 - Asks once before using the microphone.
 - Opens help and payment in your usual browser.
 

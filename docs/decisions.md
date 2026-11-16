@@ -28,6 +28,9 @@ that entry from Undecided to Decided and does not change its id.
 | [D-0014](#d-0014) | Session, permissions, and link policy |
 | [D-0015](#d-0015) | GNU GPL version 3 only |
 | [D-0016](#d-0016) | Unsigned packages for both arches |
+| [D-0017](#d-0017) | One night color treatment, derived from the page |
+| [D-0018](#d-0018) | Hide send feedback and press the consent button |
+| [D-0019](#d-0019) | Night colors from 20:00 to 06:00 |
 
 ### D-0001
 
@@ -240,7 +243,9 @@ page's `setTimeout` while context isolation is on
 ([P-0007](pitfalls.md#p-0007)).
 
 Consequence: Architecture and requirements describe that process.
-The page's own bundle keeps the card loop.
+The page's own bundle keeps the card loop. [D-0017](#d-0017)
+adds the night colors, until the study page has night colors of
+its own. [D-0018](#d-0018) adds the notice script.
 
 ### D-0013
 
@@ -321,6 +326,89 @@ Nix devshell does not build these packages
 x64 WiX toolset in this electron-builder release and installs the
 arm64 app.
 
+### D-0017
+
+Status: Decided
+
+Choice: The study page has no night colors, and learners need them
+at night. This is one study function, not a set of themes. There is
+no other color theme.
+
+Derive each night color from the color in the live page stylesheet.
+Keep that color's hue. Light surfaces become dark. Dark text becomes
+light. A later change to the official palette changes the night
+colors with it. Do not copy today's hex values into the shell.
+
+Install the treatment from `src/night-theme.js` on the study origin,
+the same way as the timer wrapper. Skip it when the page background
+is already dark, or when the page CSS uses `prefers-color-scheme`.
+Delete the script when the official page has night colors.
+
+Source: User request on 2026-11-16. The study page had no night
+colors and no `prefers-color-scheme` rule.
+
+Consequence: Requirements, architecture, and UI design describe this
+one treatment ([P-0017](pitfalls.md#p-0017)). [D-0003](#d-0003) still
+excludes every other theme.
+
+### D-0018
+
+Status: Decided
+
+Choice: Hide Lingvist's send-feedback control, `div.survey`. Leave
+the reCAPTCHA badge, its iframe, and its token field in place.
+
+Press the "OK, got it" button in `section.app-cookie-consent`. On
+the live page that button stores Lingvist's consent cookie for one
+year and hides the notice. Do not press "Find out more". That link
+opens Lingvist's terms of service. Do not filter the page's
+requests ([P-0008](pitfalls.md#p-0008),
+[P-0019](pitfalls.md#p-0019)).
+
+The study site remains Lingvist's. Lingvist's terms and privacy
+notice apply to the account. The README says that this program
+presses "OK, got it".
+
+Source: User request on 2026-11-16. A logged-in session showed the
+notice, the feedback control, and the reCAPTCHA badge. The button's
+action sets the consent cookie and hides the notice.
+
+Consequence: `src/study-notices.js` runs on the study origin with
+the other page scripts. Requirements, architecture, UI design, and
+the README describe it.
+
+### D-0019
+
+Status: Decided
+
+Choice: Night colors are on from 20:00 to 06:00 in the computer's
+local time. From 06:00 to 20:00 the study page keeps its own colors.
+The shell switches at those hours while the page stays open. There
+is no other schedule and no manual switch.
+
+A white card stays lighter than the pale page behind it. A pale
+tinted surface stays lighter than that card, so a selected control
+and a correct-answer wash remain visible. Dark colored text is
+lifted into a readable band and its saturation is capped, so a teal
+word does not become a bright cyan. Mid-tone colored text is lifted
+as well, so it stays readable on the night card. The mark in
+`.navigation-header` is painted with that same night ink, because
+its fill is an SVG attribute outside the stylesheets. The
+control that folds the sentence translation is painted the same
+way.
+
+Source: User request on 2026-11-16. A logged-in comparison showed
+white cards and the pale page collapsing together, the selected
+navigation control turning a bright purple, and the card prompt
+turning `rgb(125, 236, 252)` from `rgb(3, 120, 137)`. A later pass
+showed the selected control darker than the rail, the correct-answer
+wash `rgb(224, 235, 239)` collapsing into the page, and purple text
+`rgb(172, 110, 209)` left too close to its day color.
+
+Consequence: `src/night-theme.js` owns the clock and the conversion
+([P-0020](pitfalls.md#p-0020)). Requirements and the README name
+the hours.
+
 ## Undecided
 
-No open decisions.
+None.

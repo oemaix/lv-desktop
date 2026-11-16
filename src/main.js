@@ -11,6 +11,8 @@ const {
 } = require("./policy");
 
 const timerSource = fs.readFileSync(path.join(__dirname, "timer-wrapper.js"), "utf8");
+const nightSource = fs.readFileSync(path.join(__dirname, "night-theme.js"), "utf8");
+const noticeSource = fs.readFileSync(path.join(__dirname, "study-notices.js"), "utf8");
 const microphoneDecisionFile = "microphone.json";
 
 let mainWindow = null;
@@ -165,7 +167,7 @@ function handleNavigation(event, url, popup) {
   }
 }
 
-function installTimer(contents) {
+function installPageScript(contents, source) {
   let current;
   try {
     current = new URL(contents.getURL());
@@ -175,7 +177,7 @@ function installTimer(contents) {
   if (current.origin !== studyOrigin) {
     return;
   }
-  const running = contents.executeJavaScript(timerSource);
+  const running = contents.executeJavaScript(source);
   if (running && typeof running.catch === "function") {
     running.catch(() => {});
   }
@@ -219,7 +221,9 @@ function attachContents(contents) {
     handleNavigation(event, url, isPopup(contents));
   });
   contents.on("dom-ready", () => {
-    installTimer(contents);
+    installPageScript(contents, noticeSource);
+    installPageScript(contents, nightSource);
+    installPageScript(contents, timerSource);
   });
 }
 

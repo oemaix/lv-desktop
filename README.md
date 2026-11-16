@@ -41,7 +41,7 @@ account to study.
 
 ## Install
 
-GitHub release `v0.4.0` has one package per system and
+GitHub release `v0.5.0` has one package per system and
 processor. amd64 is the Intel or AMD 64-bit build. aarch64 is the
 ARM 64-bit build.
 

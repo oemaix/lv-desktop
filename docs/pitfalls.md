@@ -1,6 +1,6 @@
 # Pitfalls
 
-Status: binding. The next id is P-0025. Do not reuse or renumber an id.
+Status: binding. The next id is P-0026. Do not reuse or renumber an id.
 
 ## Index
 
@@ -30,6 +30,7 @@ Status: binding. The next id is P-0025. Do not reuse or renumber an id.
 | [P-0022](#p-0022) | [D-0019](decisions.md#d-0019) | The translation fold mark's fill is an attribute |
 | [P-0023](#p-0023) | [D-0006](decisions.md#d-0006) | A variable in the terminal path hides the profile |
 | [P-0024](#p-0024) | [D-0006](decisions.md#d-0006) | A missing zsh rc makes terminal exit return 1 |
+| [P-0025](#p-0025) | [D-0003](decisions.md#d-0003) | A failed study load is discarded |
 
 ## P-0001
 
@@ -297,3 +298,16 @@ When those files are absent, `.vscode/nix-develop-terminal.sh` sets
 account's own zsh startup files in place.
 
 Depends on [D-0006](decisions.md#d-0006).
+
+## P-0025
+
+Do not treat the empty `loadURL` catch as recovery. A slow network
+can fail the main-frame load of `https://learn.lingvist.com/` with
+a timeout. `createMainWindow` and `openInMainWindow` ignore that
+rejection. The window keeps the title `lv-desktop`. Do not reload
+from that catch until [D-0020](decisions.md#d-0020) chooses the
+schedule and the pattern. An immediate second `loadURL` can be
+settled by the failed load's `did-finish-load`. `ERR_ABORTED` (-3)
+is not a timeout.
+
+Depends on [D-0003](decisions.md#d-0003).

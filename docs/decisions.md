@@ -411,4 +411,44 @@ the hours.
 
 ## Undecided
 
-None.
+| Id | Summary |
+| --- | --- |
+| [D-0020](#d-0020) | A timed-out study load is not retried |
+
+### D-0020
+
+Status: Undecided
+
+The shell loads `https://learn.lingvist.com/` once.
+`BrowserWindow.loadURL` rejects when the main frame fails, from
+`did-fail-load`. `ERR_TIMED_OUT` (-7) means an operation timed out.
+`createMainWindow` and `openInMainWindow` discard that rejection.
+Electron already attaches an empty rejection handler, so the failure
+is not an unhandled rejection and does not open a dialog. The window
+keeps the product title `lv-desktop`, because the study document
+never arrives to set a title. The page scripts do not run. They wait
+for `dom-ready`.
+
+On 2026-11-21 a slow network still loaded the study site in a normal
+browser. The client console reported a timeout loading
+`learn.lingvist.com`, and the title stayed `lv-desktop`. A later
+attempt can succeed after that timeout. This client does not start
+one.
+
+Reloading is not chosen. The schedule and the pattern stay open:
+
+- Which failures count. `ERR_ABORTED` (-3) also rejects `loadURL`,
+  including when a newer navigation replaces the current one.
+- Main frame only. `did-fail-load` also fires for a subframe.
+- How long to wait, and how many times. An immediate second
+  `loadURL` is the wrong shape. A failed load can still emit
+  `did-finish-load`, and that event can settle the next `loadURL`
+  promise.
+- A retry must not replace a login page the reader is already on.
+  `openInMainWindow` loads the URL it was given, which is not always
+  the study URL.
+
+Source: User report on 2026-11-21.
+
+Consequence: No recovery is implemented.
+[P-0025](pitfalls.md#p-0025) records the trap.
